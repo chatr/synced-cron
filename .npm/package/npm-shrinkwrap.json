@@ -1,0 +1,10 @@
+{
+  "lockfileVersion": 4,
+  "dependencies": {
+    "@breejs/later": {
+      "version": "4.2.0",
+      "resolved": "https://registry.npmjs.org/@breejs/later/-/later-4.2.0.tgz",
+      "integrity": "sha512-EVMD0SgJtOuFeg0lAVbCwa+qeTKILb87jqvLyUtQswGD9+ce2nB52Y5zbTF1Hc0MDFfbydcMcxb47jSdhikVHA=="
+    }
+  }
+}
