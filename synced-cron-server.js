@@ -37,6 +37,16 @@ const SyncedCron = {
 
 export {SyncedCron};
 
+
+/**
+ * Detect Monti APM availability.
+ */
+function hasMontiTraceJob () {
+  return typeof globalThis !== 'undefined' &&
+      globalThis.Monti &&
+      typeof globalThis.Monti.traceJob === 'function';
+}
+
 /**
  * Logger factory function.
  * @param {string} prefix - Prefix for log messages.
@@ -78,6 +88,10 @@ Meteor.startup(() => {
   ['info', 'warn', 'error', 'debug'].forEach((level) => {
     log[level] = (message) => log(level, message);
   });
+
+  if (hasMontiTraceJob()) {
+    log.info('Monti.traceJob instrumentation enabled');
+  }
 
   // Don't allow TTL less than 5 minutes to avoid breaking synchronization
   const minTTL = 300;
@@ -254,10 +268,17 @@ SyncedCron._entryWrapper = function (entry) {
       }
     }
 
-    // Run and record the job
+    /**
+     * Execute the job *with* Monti instrumentation when available.
+     */
     try {
       log.info(`Starting "${entry.name}".`);
-      const output = await entry.job(intendedAt, entry.name); // Run the actual job
+
+      const waitTime = Date.now() - intendedAt.getTime();
+      const runJob = () => entry.job(intendedAt, entry.name);
+      const output = hasMontiTraceJob()
+          ? await globalThis.Monti.traceJob({ name: entry.name, waitTime }, runJob)
+          : await runJob();
 
       log.info(`Finished "${entry.name}".`);
       if (entry.persist) {

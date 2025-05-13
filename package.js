@@ -1,6 +1,6 @@
 Package.describe({
   name: 'chatra:synced-cron',
-  version: '1.0.0',
+  version: '1.0.1',
   summary: 'Define and run scheduled jobs across multiple servers.',
   git: 'https://github.com/chatr/synced-cron.git',
 });
